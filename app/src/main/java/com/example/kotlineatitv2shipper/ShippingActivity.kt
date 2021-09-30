@@ -97,7 +97,7 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
     private var redPolyline:Polyline?=null
     private var yellowPolyline:Polyline?=null
 
-    private var polylineList:List<LatLng> = ArrayList<LatLng>()
+    private var polylineList:MutableList<LatLng> = ArrayList<LatLng>()
     private var iGoogleApi:IGoogleApi?=null
     private var ifcmService:IFCMService?=null
     private var compositeDisposable = CompositeDisposable()
@@ -208,11 +208,12 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
         btn_start_trip.setOnClickListener {
             val data = Paper.book().read<String>(Common.SHIPPING_DATA)
             Paper.book().write(Common.TRIP_START,data)
-            btn_start_trip.isEnabled = false //Deactive after click
+//            btn_start_trip.isEnabled = false //Deactive after click   //TODO : Aktifkan nanti
 
             shippingOrderModel = Gson().fromJson(data,object:TypeToken<ShippingOrderModel?>(){}.type)
 
 
+            Log.d("aan", "initViews: mydata = $data")
 
             if (ActivityCompat.checkSelfPermission(
                     this,
@@ -246,6 +247,9 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ s ->
 
+                        Log.d(TAG, "initViews: nilai s = $s")
+                        Log.d("aan", "nilai data = $data")
+
                         //Get estimate time from API
                         var estimateTime = "UNKNOWN"
                         val jsonObject = JSONObject(s)
@@ -275,6 +279,7 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
                             .addOnSuccessListener { aVoid ->
                                 //Show directions from shipper to order's location after start trip
                                 drawRoutes(data)
+                                Log.d("aan", "initViews: data = $data") // tidak tampil
                             }
 
                     }, { t: Throwable? ->
@@ -781,6 +786,7 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
                                 val poly = route.getJSONObject("overview_polyline")
                                 val polyline = poly.getString("points")
                                 polylineList = Common.decodePoly(polyline)
+                                Log.d("aan", "drawRoutes: poly = $poly")
                             }
 
                             polylineOptions = PolylineOptions()
@@ -858,17 +864,58 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
                                 val route = jsonArray.getJSONObject(i)
                                 val poly = route.getJSONObject("overview_polyline")
                                 val polyline = poly.getString("points")
+
+                                Log.d("aan", "drawRoutes: myPolyline = $polyline")
                                 polylineList = Common.decodePoly(polyline)
+
+                                if (i == 0) {
+//                                    polylineList.addAll(Common.decodePoly(polyline))
+                                    //red
+                                    polylineOptions = PolylineOptions()
+                                    polylineOptions!!.color(Color.RED)
+                                    polylineOptions!!.width(12.0f)
+                                    polylineOptions!!.startCap(SquareCap())
+                                    polylineOptions!!.endCap(SquareCap())
+                                    polylineOptions!!.jointType(JointType.ROUND)
+                                    polylineOptions!!.addAll(polylineList)
+                                    redPolyline = mMap.addPolyline(polylineOptions)
+                                    Log.d("aan", "drawRoutes: myPolylineList = $polylineList")
+
+                                    Log.d("aan12345", "drawRoutes: ukuran : ${polylineList.size}")
+                                    Log.d("aan12345", "drawRoutes: indices : ${polylineList.indices}")
+
+                                }
+                                if (i == 1) {
+//                                    polylineList.addAll(Common.decodePoly(polyline))
+//                                    polylineList = Common.decodePoly(polyline)
+                                    //blue
+                                    polylineOptions = PolylineOptions()
+                                    polylineOptions!!.color(Color.BLUE)
+                                    polylineOptions!!.width(5.0f)   // ukuran rute
+                                    polylineOptions!!.startCap(SquareCap())
+                                    polylineOptions!!.endCap(SquareCap())
+                                    polylineOptions!!.jointType(JointType.ROUND)
+                                    polylineOptions!!.addAll(polylineList)
+                                    mMap.addPolyline(polylineOptions)
+                                }
+                                if (i == 2) {
+//                                    polylineList.addAll(Common.decodePoly(polyline))
+//                                    polylineList = Common.decodePoly(polyline)
+                                    //green
+                                    polylineOptions = PolylineOptions()
+                                    polylineOptions!!.color(Color.GREEN)
+                                    polylineOptions!!.width(12.0f)
+                                    polylineOptions!!.startCap(SquareCap())
+                                    polylineOptions!!.endCap(SquareCap())
+                                    polylineOptions!!.jointType(JointType.ROUND)
+                                    polylineOptions!!.addAll(polylineList)
+                                    mMap.addPolyline(polylineOptions)
+                                }
+                                if (i == 3) {
+                                    Toast.makeText(this, "masih ada rute", Toast.LENGTH_LONG).show()
+                                }
                             }
 
-                            polylineOptions = PolylineOptions()
-                            polylineOptions!!.color(Color.RED)
-                            polylineOptions!!.width(12.0f)
-                            polylineOptions!!.startCap(SquareCap())
-                            polylineOptions!!.endCap(SquareCap())
-                            polylineOptions!!.jointType(JointType.ROUND)
-                            polylineOptions!!.addAll(polylineList)
-                            redPolyline = mMap.addPolyline(polylineOptions)
 
                         }catch (e:Exception)
                         {

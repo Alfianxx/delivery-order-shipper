@@ -141,7 +141,7 @@ object Common {
         return (-1).toFloat()
     }
 
-    fun decodePoly(encoded: String): List<LatLng> {
+    fun decodePoly(encoded: String): MutableList<LatLng> {
         val poly:MutableList<LatLng> = ArrayList<LatLng>()
         var index = 0
         var len = encoded.length

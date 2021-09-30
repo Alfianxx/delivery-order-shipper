@@ -11,6 +11,7 @@ interface IGoogleApi {
         @Query("transit_routing_preference") transit_routing:String?,
         @Query("origin") origin:String?,
         @Query("destination") destination:String?,
-        @Query("key") key:String?
+        @Query("key") key:String?,
+        @Query("alternatives") alternatives: Boolean = true
     ): Observable<String?>?
 }

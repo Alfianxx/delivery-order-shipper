@@ -9,6 +9,7 @@ import android.view.animation.LayoutAnimationController
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -35,13 +36,14 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         homeViewModel =
-            ViewModelProviders.of(this).get(HomeViewModel::class.java)
+            ViewModelProvider(this).get(HomeViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_home, container, false)
         initViews(root)
-        homeViewModel!!.messageError.observe(this, Observer { s:String-> Toast.makeText(context,s,Toast.LENGTH_SHORT).show() })
-        homeViewModel!!.getOrderModelMutableLiveData(Common.currentShipperUser!!.phone!!)
-            .observe(this, Observer { shippingOrderModels:List<ShippingOrderModel> ->
-                adapter = MyShippingOrderAdapter(context!!,shippingOrderModels)
+        homeViewModel.messageError.observe(viewLifecycleOwner,
+            { s:String-> Toast.makeText(context,s,Toast.LENGTH_SHORT).show() })
+        homeViewModel.getOrderModelMutableLiveData(Common.currentShipperUser!!.phone!!)
+            .observe(viewLifecycleOwner, { shippingOrderModels:List<ShippingOrderModel> ->
+                adapter = MyShippingOrderAdapter(requireContext(),shippingOrderModels)
                 recycler_order!!.adapter = adapter
                 recycler_order!!.layoutAnimation = layoutAnimationController
             })
@@ -68,7 +70,7 @@ class HomeFragment : Fragment() {
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
-    public fun pnUpdateShippingOrder(event:UpdateShippingOrderEvent)
+    fun pnUpdateShippingOrder(event:UpdateShippingOrderEvent)
     {
         homeViewModel.getOrderModelMutableLiveData(Common.currentShipperUser!!.phone!!)
     }

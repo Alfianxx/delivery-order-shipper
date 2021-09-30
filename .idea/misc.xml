@@ -9,6 +9,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Coding/AndroidStudio/Skripsi/KotlinEatItV2Shipper/app/src/main/res/layout/activity_home.xml" value="0.25" />
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/KotlinEatItV2Shipper/app/src/main/res/layout/activity_shipping.xml" value="0.25" />
         <entry key="..\:/Coding/AndroidStudio/Skripsi/KotlinEatItV2Shipper/app/src/main/res/layout/fragment_home.xml" value="0.18645833333333334" />
         <entry key="..\:/Coding/AndroidStudio/Skripsi/KotlinEatItV2Shipper/app/src/main/res/layout/layout_shipping_order.xml" value="0.33" />
       </map>
