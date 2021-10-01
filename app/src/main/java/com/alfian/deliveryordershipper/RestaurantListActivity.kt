@@ -32,12 +32,12 @@ import org.greenrobot.eventbus.ThreadMode
 
 class RestaurantListActivity : AppCompatActivity(), IRestaurantCallbackListener {
 
-    lateinit var recycler_restaurant:RecyclerView
+    private lateinit var recyclerRestaurant:RecyclerView
     lateinit var dialog: AlertDialog
-    lateinit var layoutAnimationController:LayoutAnimationController
-    var adapter: MyRestaurantAdapter?=null
+    private lateinit var layoutAnimationController:LayoutAnimationController
+    private var adapter: MyRestaurantAdapter?=null
 
-    var serverRef:DatabaseReference?=null
+    private var serverRef:DatabaseReference?=null
     lateinit var listener: IRestaurantCallbackListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,7 +63,7 @@ class RestaurantListActivity : AppCompatActivity(), IRestaurantCallbackListener 
                     {
                         val restaurantModel = restaurantSnapshot.getValue(RestaurantModel::class.java)
                         restaurantModel!!.uid = restaurantSnapshot.key!!
-                        restaurantModels.add(restaurantModel!!)
+                        restaurantModels.add(restaurantModel)
                     }
                     if (restaurantModels.size > 0)
                         listener.onRestaurantLoadSuccess(restaurantModels)
@@ -88,21 +88,21 @@ class RestaurantListActivity : AppCompatActivity(), IRestaurantCallbackListener 
         listener = this
 
         dialog = AlertDialog.Builder(this).setCancelable(false)
-            .setMessage("Please wait...").create();
+            .setMessage("Please wait...").create()
         dialog.show()
-        layoutAnimationController = AnimationUtils.loadLayoutAnimation(this,R.anim.layout_item_from_left);
-        val layoutManager = LinearLayoutManager(this);
-        layoutManager.orientation = RecyclerView.VERTICAL;
-        recycler_restaurant = findViewById(R.id.recycler_restaurant);
-        recycler_restaurant.layoutManager = layoutManager;
-        recycler_restaurant.addItemDecoration(DividerItemDecoration(this,layoutManager.orientation));
+        layoutAnimationController = AnimationUtils.loadLayoutAnimation(this,R.anim.layout_item_from_left)
+        val layoutManager = LinearLayoutManager(this)
+        layoutManager.orientation = RecyclerView.VERTICAL
+        recyclerRestaurant = findViewById(R.id.recycler_restaurant)
+        recyclerRestaurant.layoutManager = layoutManager
+        recyclerRestaurant.addItemDecoration(DividerItemDecoration(this,layoutManager.orientation))
     }
 
     override fun onRestaurantLoadSuccess(restaurantList: List<RestaurantModel>) {
         dialog.dismiss()
         adapter = MyRestaurantAdapter(this,restaurantList)
-        recycler_restaurant.adapter = adapter!!
-        recycler_restaurant.layoutAnimation = layoutAnimationController
+        recyclerRestaurant.adapter = adapter!!
+        recyclerRestaurant.layoutAnimation = layoutAnimationController
     }
 
     override fun onRestaurantLoadFailed(message: String) {
@@ -122,14 +122,9 @@ class RestaurantListActivity : AppCompatActivity(), IRestaurantCallbackListener 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     fun onRestaurantSelectEvent(restaurantSelectEvent: RestaurantSelectEvent)
     {
-        if (restaurantSelectEvent != null)
-        {
-
-
-            val user = FirebaseAuth.getInstance().currentUser
-            if (user != null)
-                checkServerUserFromFirebase(user,restaurantSelectEvent.restaurantModel)
-        }
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user != null)
+            checkServerUserFromFirebase(user,restaurantSelectEvent.restaurantModel)
     }
 
     private fun checkServerUserFromFirebase(user: FirebaseUser, restaurantModel: RestaurantModel) {
@@ -169,55 +164,63 @@ class RestaurantListActivity : AppCompatActivity(), IRestaurantCallbackListener 
     }
 
     private fun showRegisterDialog(user: FirebaseUser, uid: String) {
-        val builder = androidx.appcompat.app.AlertDialog.Builder(this@RestaurantListActivity)
+        val builder = AlertDialog.Builder(this@RestaurantListActivity)
         builder.setTitle("Register")
         builder.setMessage("Please fill information \n Admin will accept your account late")
 
         val itemView = LayoutInflater.from(this).inflate(R.layout.layout_register,null)
-        val phone_input_layout = itemView.findViewById<View>(R.id.phone_input_layout) as TextInputLayout
-        val edt_name = itemView.findViewById<View>(R.id.edt_name) as EditText
-        val edt_phone = itemView.findViewById<View>(R.id.edt_phone) as EditText
+        val phoneInputLayout = itemView.findViewById<View>(R.id.phone_input_layout) as TextInputLayout
+        val edtName = itemView.findViewById<View>(R.id.edt_name) as EditText
+        val edtPhone = itemView.findViewById<View>(R.id.edt_phone) as EditText
 
         //set
         if (user.phoneNumber == null || TextUtils.isEmpty(user.phoneNumber))
         {
-            phone_input_layout.hint = "Email"
-            edt_phone.setText(user.email)
-            edt_name.setText(user.displayName)
+            phoneInputLayout.hint = "Email"
+            edtPhone.setText(user.email)
+            edtName.setText(user.displayName)
         }
         else
-            edt_phone.setText(user!!.phoneNumber)
+            edtPhone.setText(user.phoneNumber)
 
-        builder.setNegativeButton("CANCEL",{dialogInterface, _ -> dialogInterface.dismiss() })
-            .setPositiveButton("REGISTER", {_, _ ->
-                if (TextUtils.isEmpty(edt_name.text))
-                {
-                    Toast.makeText(this,"Please enter your name",Toast.LENGTH_SHORT).show()
+        builder.setNegativeButton("CANCEL") { dialogInterface, _ -> dialogInterface.dismiss() }
+            .setPositiveButton("REGISTER") { _, _ ->
+                if (TextUtils.isEmpty(edtName.text)) {
+                    Toast.makeText(this, "Please enter your name", Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
 
                 val serverUserModel = ShipperUserModel()
                 serverUserModel.uid = user.uid
-                serverUserModel.name = edt_name.text.toString()
-                serverUserModel.phone = edt_phone.text.toString()
-                serverUserModel.isActive = false //Default fail, we must active user by manual on Firebase
+                serverUserModel.name = edtName.text.toString()
+                serverUserModel.phone = edtPhone.text.toString()
+                serverUserModel.isActive =
+                    false //Default fail, we must active user by manual on Firebase
 
-                dialog!!.show()
+                dialog.show()
                 //Init server ref
                 serverRef = FirebaseDatabase.getInstance().getReference(Common.RESTAURANT_REF)
                     .child(uid)
                     .child(Common.SHIPPER_REF)
                 serverRef!!.child(serverUserModel.uid!!)
                     .setValue(serverUserModel)
-                    .addOnFailureListener{ e ->
-                        dialog!!.dismiss()
-                        Toast.makeText(this@RestaurantListActivity,""+e.message,Toast.LENGTH_SHORT).show()
+                    .addOnFailureListener { e ->
+                        dialog.dismiss()
+                        Toast.makeText(
+                            this@RestaurantListActivity,
+                            "" + e.message,
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
-                    .addOnCompleteListener{_ ->
-                        dialog!!.dismiss()
-                        Toast.makeText(this@RestaurantListActivity,"Register success! Admin will check and active user soon",Toast.LENGTH_SHORT).show()
+                    .addOnCompleteListener {
+                        dialog.dismiss()
+                        Toast.makeText(
+                            this@RestaurantListActivity,
+                            "Register success! Admin will check and active user soon",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
-            })
+            }
 
         builder.setView(itemView)
 
@@ -227,11 +230,11 @@ class RestaurantListActivity : AppCompatActivity(), IRestaurantCallbackListener 
 
     private fun goToHomeActivity(userModel: ShipperUserModel,restaurantModel: RestaurantModel) {
         dialog.dismiss()
-        Common.currentShipperUser = userModel;
+        Common.currentShipperUser = userModel
         val jsonEncode = Gson().toJson(restaurantModel) //encode all information
         Paper.init(this)
         Paper.book().write(Common.RESTAURANT_SAVE,jsonEncode)
-        startActivity(Intent(this, com.alfian.deliveryordershipper.HomeActivity::class.java))
+        startActivity(Intent(this, HomeActivity::class.java))
         finish()
     }
 }

@@ -20,32 +20,23 @@ import io.paperdb.Paper
 import java.text.SimpleDateFormat
 
 class MyShippingOrderAdapter(var context: Context,
-                             var shippingOrderModelList:List<ShippingOrderModel>) : RecyclerView.Adapter<MyShippingOrderAdapter.MyViewHolder>() {
+                             private var shippingOrderModelList:List<ShippingOrderModel>) : RecyclerView.Adapter<MyShippingOrderAdapter.MyViewHolder>() {
 
-    var simpleDateFormat:SimpleDateFormat
+    private var simpleDateFormat:SimpleDateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
 
     init {
-        simpleDateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
         Paper.init(context)
     }
 
     inner class MyViewHolder(itemView: View):RecyclerView.ViewHolder(itemView)
     {
-        var txt_date:TextView
-        var txt_order_address:TextView
-        var txt_order_number:TextView
-        var txt_payment:TextView
-        var img_food:ImageView
-        var btn_ship_now:MaterialButton
+        var txtDate:TextView = itemView.findViewById(R.id.txt_date) as TextView
+        var txtOrderAddress:TextView = itemView.findViewById(R.id.txt_order_address) as TextView
+        var txtOrderNumber:TextView = itemView.findViewById(R.id.txt_order_number) as TextView
+        var txtPayment:TextView = itemView.findViewById(R.id.txt_payment) as TextView
+        var imgFood:ImageView = itemView.findViewById(R.id.img_food) as ImageView
+        var btnShipNow:MaterialButton = itemView.findViewById(R.id.btn_ship_now) as MaterialButton
 
-        init {
-            txt_date = itemView.findViewById(R.id.txt_date) as TextView
-            txt_order_address = itemView.findViewById(R.id.txt_order_address) as TextView
-            txt_order_number = itemView.findViewById(R.id.txt_order_number) as TextView
-            txt_payment = itemView.findViewById(R.id.txt_payment) as TextView
-            img_food = itemView.findViewById(R.id.img_food) as ImageView
-            btn_ship_now = itemView.findViewById(R.id.btn_ship_now) as MaterialButton
-        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -60,26 +51,26 @@ class MyShippingOrderAdapter(var context: Context,
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         Glide.with(context)
             .load(
-                shippingOrderModelList.get(position)
+                shippingOrderModelList[position]
                     .orderModel!!.cartItemList!![0].foodImage)
-            .into(holder.img_food)
-        holder.txt_date!!.text = StringBuilder(simpleDateFormat.format(shippingOrderModelList[position].orderModel!!.createDate))
+            .into(holder.imgFood)
+        holder.txtDate.text = StringBuilder(simpleDateFormat.format(shippingOrderModelList[position].orderModel!!.createDate))
         Common.setSpanStringColor("No.: ",shippingOrderModelList[position].orderModel!!.key,
-        holder.txt_order_number,Color.parseColor("#BA454A"))
+        holder.txtOrderNumber,Color.parseColor("#BA454A"))
 
         Common.setSpanStringColor("Address.: ",shippingOrderModelList[position].orderModel!!.shippingAddress,
-            holder.txt_order_address,Color.parseColor("#BA454A"))
+            holder.txtOrderAddress,Color.parseColor("#BA454A"))
 
         Common.setSpanStringColor("Payment.: ",shippingOrderModelList[position].orderModel!!.transactionId,
-            holder.txt_payment,Color.parseColor("#BA454A"))
+            holder.txtPayment,Color.parseColor("#BA454A"))
 
         if (shippingOrderModelList[position].isStartTrip)
         {
-            holder.btn_ship_now.isEnabled=false
+            holder.btnShipNow.isEnabled=false
         }
 
         //Event
-        holder.btn_ship_now.setOnClickListener {
+        holder.btnShipNow.setOnClickListener {
 
             //Write data
             Paper.book().write(Common.SHIPPING_DATA, Gson().toJson(shippingOrderModelList[0]))

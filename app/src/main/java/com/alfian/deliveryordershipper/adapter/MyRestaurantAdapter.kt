@@ -25,11 +25,11 @@ class MyRestaurantAdapter (internal var context: Context,
             listener!!.onItemClick(view!!,adapterPosition)
         }
 
-        var txt_restaurant_name: TextView?=null
-        var txt_restaurant_address: TextView?=null
-        var img_restaurant: ImageView?=null
+        var txtRestaurantName: TextView?=null
+        var txtRestaurantAddress: TextView?=null
+        var imgRestaurant: ImageView?=null
 
-        internal var listener: IRecyclerItemClickListener?=null
+        private var listener: IRecyclerItemClickListener?=null
 
         fun setListener(listener: IRecyclerItemClickListener)
         {
@@ -37,9 +37,9 @@ class MyRestaurantAdapter (internal var context: Context,
         }
 
         init{
-            txt_restaurant_name = itemView.findViewById(R.id.txt_restaurant_name) as TextView
-            txt_restaurant_address = itemView.findViewById(R.id.txt_restaurant_address) as TextView
-            img_restaurant = itemView.findViewById(R.id.img_restaurant) as ImageView
+            txtRestaurantName = itemView.findViewById(R.id.txt_restaurant_name) as TextView
+            txtRestaurantAddress = itemView.findViewById(R.id.txt_restaurant_address) as TextView
+            imgRestaurant = itemView.findViewById(R.id.img_restaurant) as ImageView
             itemView.setOnClickListener(this)
         }
 
@@ -54,9 +54,9 @@ class MyRestaurantAdapter (internal var context: Context,
 
     override fun onBindViewHolder(holder: MyRestaurantAdapter.MyViewHolder, position: Int) {
         Glide.with(context).load(restaurantList[position].imageUrl)
-            .into(holder.img_restaurant!!)
-        holder.txt_restaurant_name!!.setText(restaurantList[position].name)
-        holder.txt_restaurant_address!!.setText(restaurantList[position].address)
+            .into(holder.imgRestaurant!!)
+        holder.txtRestaurantName!!.text = restaurantList[position].name
+        holder.txtRestaurantAddress!!.text = restaurantList[position].address
 
         holder.setListener(object : IRecyclerItemClickListener{
             override fun onItemClick(view: View, pos: Int) {

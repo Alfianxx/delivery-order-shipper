@@ -97,14 +97,14 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
     private var redPolyline:Polyline?=null
     private var yellowPolyline:Polyline?=null
 
-    private var polylineList:MutableList<LatLng> = ArrayList<LatLng>()
+    private var polylineList:MutableList<LatLng> = ArrayList()
     private var iGoogleApi: IGoogleApi?=null
     private var ifcmService: IFCMService?=null
     private var compositeDisposable = CompositeDisposable()
 
-    private lateinit var places_fragment:AutocompleteSupportFragment
+    private lateinit var placesFragment:AutocompleteSupportFragment
     private lateinit var placesClient:PlacesClient
-    private val placeFields = Arrays.asList(
+    private val placeFields = mutableListOf(
         Place.Field.ID,
         Place.Field.NAME,
         Place.Field.ADDRESS,
@@ -127,8 +127,8 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
 
         Log.d(TAG, "onCreate: run...")
 
-        Dexter.withActivity(this)
-            .withPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)
+        Dexter.withContext(this)
+            .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
             .withListener(object:PermissionListener{
                 override fun onPermissionGranted(response: PermissionGrantedResponse?) {
                     // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -171,17 +171,17 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
 
             }).check()
 
-        initViews();
+        initViews()
 
 
     }
 
     private fun setupPlaceAutocomplete() {
-        places_fragment = supportFragmentManager
+        placesFragment = supportFragmentManager
             .findFragmentById(R.id.places_autocomplete_fragment) as AutocompleteSupportFragment
-        places_fragment.setPlaceFields(placeFields)
+        placesFragment.setPlaceFields(placeFields)
         Log.d(TAG, "setupPlaceAutocomplete: run....")
-        places_fragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
+        placesFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
             override fun onPlaceSelected(place: Place) {
 
                 Log.d(TAG, "onPlaceSelected run.......")
@@ -251,7 +251,7 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
                         Log.d("aan", "nilai data = $data")
 
                         //Get estimate time from API
-                        var estimateTime = "UNKNOWN"
+                        val estimateTime: String
                         val jsonObject = JSONObject(s)
                         val routes = jsonObject.getJSONArray("routes")
                         val `object` = routes.getJSONObject(0)
@@ -261,22 +261,22 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
                         val time = legsObject.getJSONObject("duration")
                         estimateTime = time.getString("text")
 
-                        val update_data = HashMap<String, Any>()
-                        update_data.put("currentLat", location.latitude);
-                        update_data.put("currentLng", location.longitude);
-                        update_data.put("estimateTime", estimateTime)
+                        val updateData = HashMap<String, Any>()
+                        updateData["currentLat"] = location.latitude
+                        updateData["currentLng"] = location.longitude
+                        updateData["estimateTime"] = estimateTime
 
                         FirebaseDatabase.getInstance()
                             .getReference(Common.RESTAURANT_REF)
                             .child(Common.currentRestaurant!!.uid)
                             .child(Common.SHIPPING_ORDER_REF)
                             .child(shippingOrderModel!!.key!!)
-                            .updateChildren(update_data)
+                            .updateChildren(updateData)
                             .addOnFailureListener { e ->
                                 Log.d("abcd", "initViews: ${e.message}")
                                 Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
                             }
-                            .addOnSuccessListener { aVoid ->
+                            .addOnSuccessListener {
                                 //Show directions from shipper to order's location after start trip
                                 drawRoutes(data)
                                 Log.d("aan", "initViews: data = $data") // tidak tampil
@@ -308,7 +308,7 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
                     ) != PackageManager.PERMISSION_GRANTED
                 ){
                     //Request Permission
-                    Dexter.withActivity(this)
+                    Dexter.withContext(this)
                         .withPermission(Manifest.permission.CALL_PHONE)
                         .withListener(object:PermissionListener{
                             override fun onPermissionGranted(response: PermissionGrantedResponse?) {
@@ -341,8 +341,8 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
                 val builder = AlertDialog.Builder(this)
                     .setTitle("Done Order")
                     .setMessage("Confirm you already shipped this order")
-                    .setNegativeButton("NO"){ dialogInterface, i -> dialogInterface.dismiss() }
-                    .setPositiveButton("YES"){ dialogInterface, i ->
+                    .setNegativeButton("NO"){ dialogInterface, _ -> dialogInterface.dismiss() }
+                    .setPositiveButton("YES"){ _, _ ->
 
                         //Create waiting dialog
                         val dialog = AlertDialog.Builder(this)
@@ -353,16 +353,16 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
                         dialog.show()
 
                         //Update order
-                        val update_data = HashMap<String,Any>()
-                        update_data.put("orderStatus",2)
-                        update_data.put("shipperUid",Common.currentShipperUser!!.uid!!)
+                        val updateData = HashMap<String,Any>()
+                        updateData["orderStatus"] = 2
+                        updateData["shipperUid"] = Common.currentShipperUser!!.uid!!
 
                         FirebaseDatabase.getInstance()
                             .getReference(Common.RESTAURANT_REF)
                             .child(shippingOrderModel!!.restaurantKey!!)
                             .child(Common.ORDER_REF)
                             .child(shippingOrderModel!!.orderModel!!.key!!)
-                            .updateChildren(update_data)
+                            .updateChildren(updateData)
                             .addOnFailureListener { e-> Toast.makeText(this@ShippingActivity,e.message,Toast.LENGTH_LONG).show() }
                             .addOnSuccessListener {
 
@@ -393,9 +393,10 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
                                                     {
                                                         val tokenModel = p0.getValue(TokenModel::class.java)
                                                         val notiData = HashMap<String,String>()
-                                                        notiData.put(Common.NOTI_TITLE,"Your order has been shipped");
-                                                        notiData.put(Common.NOTI_CONTENT,StringBuilder("Your order has been shipped by shipper")
-                                                            .append(Common.currentShipperUser!!.phone!!).toString())
+                                                        notiData[Common.NOTIF_TITLE] = "Your order has been shipped"
+                                                        notiData[Common.NOTIF_CONTENT] =
+                                                            StringBuilder("Your order has been shipped by shipper")
+                                                                .append(Common.currentShipperUser!!.phone!!).toString()
 
                                                         val sendData = FCMSendData(tokenModel!!.token!!,notiData)
 
@@ -455,7 +456,7 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
             override fun onLocationResult(p0: LocationResult?) {
                 super.onLocationResult(p0)
                 val locationShipper = LatLng(p0!!.lastLocation.latitude,
-                    p0!!.lastLocation.longitude)
+                    p0.lastLocation.longitude)
 
                 updateLocation(p0.lastLocation)
 
@@ -467,12 +468,12 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
                         R.drawable.shipper)
                     val b = bitmapDrawable!!.toBitmap()
                     val smallMarker = Bitmap.createScaledBitmap(b,width,height,false)
-                    shipperMarker = mMap!!.addMarker(MarkerOptions()
+                    shipperMarker = mMap.addMarker(MarkerOptions()
                         .icon(BitmapDescriptorFactory.fromBitmap(smallMarker))
                         .position(locationShipper)
                         .title("You"))
 
-                    mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(locationShipper,18f))
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(locationShipper,18f))
 
                     Log.d(TAG, "onLocationResult: run...")
                 }
@@ -527,7 +528,7 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
 
                             Log.d(TAG, "updateLocation: run 1....")
                             //Get estimate time from API
-                            var estimateTime = "UNKNOWN"
+                            val estimateTime: String
                             val jsonObject = JSONObject(s)
                             val routes = jsonObject.getJSONArray("routes")
                             Log.d(TAG, "updateLocation: s = $s")
@@ -538,10 +539,10 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
                             val time = legsObject.getJSONObject("duration")
                             estimateTime = time.getString("text")
 
-                            val update_data = HashMap<String, Any>()
-                            update_data.put("currentLat", lastLocation!!.latitude);
-                            update_data.put("currentLng", lastLocation!!.longitude);
-                            update_data.put("estimateTime", estimateTime)
+                            val updateData = HashMap<String, Any>()
+                            updateData["currentLat"] = lastLocation!!.latitude
+                            updateData["currentLng"] = lastLocation.longitude
+                            updateData["estimateTime"] = estimateTime
 
                             Log.d(TAG, "updateLocation: run 2...")
 
@@ -550,7 +551,7 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
                                 .child(Common.currentRestaurant!!.uid)
                                 .child(Common.SHIPPING_ORDER_REF)
                                 .child(shippingOrderModel!!.key!!)
-                                .updateChildren(update_data)
+                                .updateChildren(updateData)
                                 .addOnFailureListener { e ->
                                     Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
                                 } //in updateLocation, we just remove drawPath
@@ -618,8 +619,8 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
 
                     //Animator
                     val polylineAnimator = ValueAnimator.ofInt(0,100)
-                    polylineAnimator.setDuration(2000)
-                    polylineAnimator.setInterpolator(LinearInterpolator())
+                    polylineAnimator.duration = 2000
+                    polylineAnimator.interpolator = LinearInterpolator()
                     polylineAnimator.addUpdateListener { valueAnimator ->
                         val points = greyPolyline!!.points
                         val percentValue = Integer.parseInt(valueAnimator.animatedValue.toString())
@@ -645,17 +646,17 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
                             }
 
                             val valueAnimator = ValueAnimator.ofInt(0,1)
-                            valueAnimator.setDuration(1500)
-                            valueAnimator.setInterpolator(LinearInterpolator())
-                            valueAnimator.addUpdateListener { valueAnimator ->
-                                v = valueAnimator.animatedFraction
+                            valueAnimator.duration = 1500
+                            valueAnimator.interpolator = LinearInterpolator()
+                            valueAnimator.addUpdateListener { valueAnim ->
+                                v = valueAnim.animatedFraction
                                 lat = v * endPosition!!.latitude + (1-v) * startPosition!!.latitude
                                 lng = v * endPosition!!.longitude + (1-v) * startPosition!!.longitude
 
                                 val newPos = LatLng(lat,lng)
                                 marker!!.position = newPos
-                                marker!!.setAnchor(0.5f,0.5f)
-                                marker!!.rotation = Common.getBearing(startPosition!!,newPos)
+                                marker.setAnchor(0.5f,0.5f)
+                                marker.rotation = Common.getBearing(startPosition!!,newPos)
 
                                 mMap.moveCamera(CameraUpdateFactory.newLatLng(marker.position)) //Fixed
 
@@ -685,7 +686,7 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun setShippingOrderModel() {
         Paper.init(this)
-        var data:String?=""
+        val data: String?
         if (TextUtils.isEmpty(Paper.book().read(Common.TRIP_START)))
         {
             data = Paper.book().read<String>(Common.SHIPPING_DATA)
@@ -698,7 +699,7 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         if (!TextUtils.isEmpty(data))
         {
-            drawRoutes(data);
+            drawRoutes(data)
             shippingOrderModel = Gson()
                 .fromJson<ShippingOrderModel>(data,object:TypeToken<ShippingOrderModel>(){}.type)
 
@@ -724,7 +725,7 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
                 ))
 
                 Glide.with(this)
-                    .load(shippingOrderModel!!.orderModel!!.cartItemList!![0]!!.foodImage)
+                    .load(shippingOrderModel!!.orderModel!!.cartItemList!![0].foodImage)
                     .into(img_food_image)
             }
         }
@@ -932,9 +933,9 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun buildLocationRequest() {
         locationRequest = LocationRequest()
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-        locationRequest.setInterval(15000); //15sec
-        locationRequest.setFastestInterval(10000) //10 sec
-        locationRequest.setSmallestDisplacement(20f)
+        locationRequest.interval = 15000 //15sec
+        locationRequest.fastestInterval = 10000 //10 sec
+        locationRequest.smallestDisplacement = 20f
     }
 
     /**
@@ -951,7 +952,7 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
 
         setShippingOrderModel()
 
-        mMap!!.uiSettings.isZoomControlsEnabled = true
+        mMap.uiSettings.isZoomControlsEnabled = true
         try {
             val success = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.uber_light_with_label))
             if (!success)

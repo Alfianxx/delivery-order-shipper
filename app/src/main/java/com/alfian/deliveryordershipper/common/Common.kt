@@ -24,26 +24,28 @@ import com.alfian.deliveryordershipper.model.ShipperUserModel
 import com.alfian.deliveryordershipper.model.TokenModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.database.FirebaseDatabase
+import kotlin.math.abs
+import kotlin.math.atan
 
 object Common {
-    val RESTAURANT_SAVE: String="RESTAURANT_SAVE"
+    const val RESTAURANT_SAVE: String="RESTAURANT_SAVE"
     var currentRestaurant: RestaurantModel?=null
-    val RESTAURANT_REF: String="Restaurant" //same as firebase
-    val TRIP_START: String?="Trip"
-    val SHIPPING_DATA: String?="ShippingData"
-    val SHIPPING_ORDER_REF: String="ShippingOrder" //same as server app
-    val ORDER_REF: String="Order"
-    val SHIPPER_REF = "Shipper"
+    const val RESTAURANT_REF: String="Restaurant" //same as firebase
+    const val TRIP_START: String ="Trip"
+    const val SHIPPING_DATA: String ="ShippingData"
+    const val SHIPPING_ORDER_REF: String="ShippingOrder" //same as server app
+    const val ORDER_REF: String="Order"
+    const val SHIPPER_REF = "Shipper"
     var currentShipperUser: ShipperUserModel? = null
 
-    const val NOTI_TITLE = "title"
-    const val NOTI_CONTENT = "content"
+    const val NOTIF_TITLE = "title"
+    const val NOTIF_CONTENT = "content"
     const val CATEGORY_REF: String = "Category"
 
     val FULL_WIDTH_COLUMN: Int=1
     val DEFAULT_COLUMN_COUNT: Int=0
 
-    val TOKEN_REF = "Tokens"
+    const val TOKEN_REF = "Tokens"
 
     fun setSpanString(welcome: String, name: String?, txtUser: TextView?) {
         val builder = SpannableStringBuilder()
@@ -61,12 +63,12 @@ object Common {
         val txtSpannable = SpannableString(name)
         val boldSpan = StyleSpan(Typeface.BOLD)
         txtSpannable.setSpan(boldSpan,0,name!!.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        txtSpannable.setSpan(ForegroundColorSpan(color),0,name!!.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        txtSpannable.setSpan(ForegroundColorSpan(color),0, name.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         builder.append(txtSpannable)
         txtUser!!.setText(builder,TextView.BufferType.SPANNABLE)
     }
 
-    fun convertStatusToString(orderStatus: Int): String? =
+    fun convertStatusToString(orderStatus: Int): String =
         when(orderStatus)
         {
             0 -> "Placed"
@@ -78,11 +80,11 @@ object Common {
 
     fun updateToken(context: Context, token: String, isServerToken:Boolean, isShipperToken:Boolean) {
        //Fix crash on first time run
-        if (Common.currentShipperUser != null)
+        if (currentShipperUser != null)
         {
             FirebaseDatabase.getInstance()
-                .getReference(Common.TOKEN_REF)
-                .child(Common.currentShipperUser!!.uid!!) //okay, cause we have!! after Common.currentuser, so it is null. we will not update it
+                .getReference(TOKEN_REF)
+                .child(currentShipperUser!!.uid!!) //okay, cause we have!! after Common.currentUser, so it is null. we will not update it
                 .setValue(TokenModel(currentShipperUser!!.phone!!,token,isServerToken,isShipperToken))
                 .addOnFailureListener{ e-> Toast.makeText(context,""+e.message, Toast.LENGTH_SHORT).show()}
         }
@@ -92,12 +94,12 @@ object Common {
         var pendingIntent : PendingIntent?=null
         if (intent != null)
             pendingIntent = PendingIntent.getActivity(context,id,intent,PendingIntent.FLAG_UPDATE_CURRENT)
-        val NOTIFICATION_CHANNEL_ID = "com.example.eatitv2"
+        val notificationChannelId = "com.alfian.deliveryordershipper"
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         {
-            val notificationChannel = NotificationChannel(NOTIFICATION_CHANNEL_ID,
+            val notificationChannel = NotificationChannel(notificationChannelId,
                 "Eat It V2",NotificationManager.IMPORTANCE_DEFAULT)
 
             notificationChannel.description = "Eat It V2"
@@ -108,7 +110,7 @@ object Common {
 
             notificationManager.createNotificationChannel(notificationChannel)
         }
-        val builder = NotificationCompat.Builder(context,NOTIFICATION_CHANNEL_ID)
+        val builder = NotificationCompat.Builder(context,notificationChannelId)
 
         builder.setContentTitle(title!!).setContentText(content!!).setAutoCancel(true)
             .setSmallIcon(R.mipmap.ic_launcher_round)
@@ -126,25 +128,25 @@ object Common {
     }
 
     fun getBearing(begin: LatLng, end: LatLng): Float {
-        val lat = Math.abs(begin.latitude - end.latitude)
-        val lng = Math.abs(begin.longitude - end.longitude)
+        val lat = abs(begin.latitude - end.latitude)
+        val lng = abs(begin.longitude - end.longitude)
         if (begin.latitude < end.latitude && begin.longitude < end.longitude) return Math.toDegrees(
-            Math.atan(lng / lat)
+            atan(lng / lat)
         )
             .toFloat() else if (begin.latitude >= end.latitude && begin.longitude < end.longitude) return (90 - Math.toDegrees(
-            Math.atan(lng / lat)
+            atan(lng / lat)
         ) + 90).toFloat() else if (begin.latitude >= end.latitude && begin.longitude >= end.longitude) return (Math.toDegrees(
-            Math.atan(lng / lat)
+            atan(lng / lat)
         ) + 180).toFloat() else if (begin.latitude < end.latitude && begin.longitude >= end.longitude) return (90 - Math.toDegrees(
-            Math.atan(lng / lat)
+            atan(lng / lat)
         ) + 270).toFloat()
         return (-1).toFloat()
     }
 
     fun decodePoly(encoded: String): MutableList<LatLng> {
-        val poly:MutableList<LatLng> = ArrayList<LatLng>()
+        val poly:MutableList<LatLng> = ArrayList()
         var index = 0
-        var len = encoded.length
+        val len = encoded.length
         var lat = 0
         var lng = 0
         while (index < len)
@@ -153,7 +155,7 @@ object Common {
             var shift=0
             var result = 0
             do {
-                b = encoded[index++].toInt() - 63
+                b = encoded[index++].code - 63
                 result = result or (b and 0x1f shl shift)
                 shift +=5
 
@@ -163,7 +165,7 @@ object Common {
             shift = 0
             result = 0
             do {
-                b = encoded[index++].toInt() - 63
+                b = encoded[index++].code - 63
                 result = result or (b and 0x1f shl shift)
                 shift +=5
             }while (b >= 0x20)
@@ -175,8 +177,8 @@ object Common {
         return poly
     }
 
-    fun buildLocationString(location: Location?): String? {
-            return StringBuilder().append(location!!.latitude).append(",").append(location!!.longitude).toString()
+    fun buildLocationString(location: Location?): String {
+            return StringBuilder().append(location!!.latitude).append(",").append(location.longitude).toString()
     }
 
 }

@@ -22,9 +22,9 @@ import org.greenrobot.eventbus.ThreadMode
 
 class HomeFragment : Fragment() {
     
-    var recycler_order: RecyclerView?=null
-    var layoutAnimationController : LayoutAnimationController?= null
-    var adapter: MyShippingOrderAdapter?=null
+    private var recyclerOrder: RecyclerView?=null
+    private var layoutAnimationController : LayoutAnimationController?= null
+    private var adapter: MyShippingOrderAdapter?=null
 
     private lateinit var homeViewModel: HomeViewModel
 
@@ -42,16 +42,16 @@ class HomeFragment : Fragment() {
         homeViewModel.getOrderModelMutableLiveData(Common.currentShipperUser!!.phone!!)
             .observe(viewLifecycleOwner, { shippingOrderModels:List<ShippingOrderModel> ->
                 adapter = MyShippingOrderAdapter(requireContext(),shippingOrderModels)
-                recycler_order!!.adapter = adapter
-                recycler_order!!.layoutAnimation = layoutAnimationController
+                recyclerOrder!!.adapter = adapter
+                recyclerOrder!!.layoutAnimation = layoutAnimationController
             })
         return root
     }
 
     private fun initViews(root: View?) {
-        recycler_order = root!!.findViewById(R.id.recycler_order) as RecyclerView
-        recycler_order!!.setHasFixedSize(true)
-        recycler_order!!.layoutManager = LinearLayoutManager(context)
+        recyclerOrder = root!!.findViewById(R.id.recycler_order) as RecyclerView
+        recyclerOrder!!.setHasFixedSize(true)
+        recyclerOrder!!.layoutManager = LinearLayoutManager(context)
         layoutAnimationController = AnimationUtils.loadLayoutAnimation(context,R.anim.layout_item_from_left)
     }
 

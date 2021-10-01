@@ -13,19 +13,18 @@ import com.google.firebase.database.ValueEventListener
 
 class HomeViewModel : ViewModel(), IShippingOrderCallbackListener {
 
-    private val orderModelMutableLiveData:MutableLiveData<List<ShippingOrderModel>>
-    val messageError:MutableLiveData<String>
+    private val orderModelMutableLiveData:MutableLiveData<List<ShippingOrderModel>> =
+        MutableLiveData()
+    val messageError:MutableLiveData<String> = MutableLiveData()
     private val listener: IShippingOrderCallbackListener
 
     init {
-        orderModelMutableLiveData = MutableLiveData()
-        messageError = MutableLiveData()
         listener = this
     }
 
     fun getOrderModelMutableLiveData(shipperPhone:String):MutableLiveData<List<ShippingOrderModel>>{
         //Fix crash when press back button - put app to background
-        if (shipperPhone != null && !TextUtils.isEmpty(shipperPhone))
+        if (!TextUtils.isEmpty(shipperPhone))
             loadOrderByShipper(shipperPhone)
         return orderModelMutableLiveData
     }
@@ -49,7 +48,7 @@ class HomeViewModel : ViewModel(), IShippingOrderCallbackListener {
                 {
                     val shippingOrder = itemSnapshot.getValue(ShippingOrderModel::class.java)
                     shippingOrder!!.key = itemSnapshot.key
-                    tempList.add(shippingOrder!!)
+                    tempList.add(shippingOrder)
                 }
                 listener.onShippingOrderLoadSuccess(tempList)
             }

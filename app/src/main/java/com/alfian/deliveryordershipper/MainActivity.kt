@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
     private var providers : List<AuthUI.IdpConfig>? = null
 
     companion object{
-        private val APP_REQUEST_CODE = 7171
+        private const val APP_REQUEST_CODE = 7171
     }
 
     override fun onStart() {
@@ -46,41 +46,34 @@ class MainActivity : AppCompatActivity() {
         init()
 
         //Delete data
-        Paper.init(this);
+        Paper.init(this)
 //        Paper.book().delete(Common.TRIP_START)
 //        Paper.book().delete(Common.SHIPPING_DATA)
     }
 
     private fun init() {
-        providers = Arrays.asList<AuthUI.IdpConfig>(AuthUI.IdpConfig.PhoneBuilder().build(),
+        providers = listOf(AuthUI.IdpConfig.PhoneBuilder().build(),
         AuthUI.IdpConfig.EmailBuilder().build())
 
         serverRef = FirebaseDatabase.getInstance().getReference(Common.SHIPPER_REF)
         firebaseAuth = FirebaseAuth.getInstance()
         dialog = SpotsDialog.Builder().setContext(this).setCancelable(false).build()
-        listener = object:FirebaseAuth.AuthStateListener{
-            override fun onAuthStateChanged(firebaseAuth: FirebaseAuth) {
-                val user = firebaseAuth.currentUser
-                if (user != null)
-                {
-                    Paper.init(this@MainActivity)
-                    val jsonEncode = Paper.book().read<String>(Common.RESTAURANT_SAVE)
-                    val restaurantModel = Gson().fromJson<RestaurantModel>(jsonEncode,
+        listener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+            val user = firebaseAuth.currentUser
+            if (user != null) {
+                Paper.init(this@MainActivity)
+                val jsonEncode = Paper.book().read<String>(Common.RESTAURANT_SAVE)
+                val restaurantModel = Gson().fromJson<RestaurantModel>(jsonEncode,
                     object:TypeToken<RestaurantModel>(){}.type)
-                    if (restaurantModel != null)
-                        checkServerUserFromFirebase(user,restaurantModel!!)
-                    else
-                    {
-                        startActivity(Intent(this@MainActivity,RestaurantListActivity::class.java))
-                        finish()
-                    }
+                if (restaurantModel != null)
+                    checkServerUserFromFirebase(user, restaurantModel)
+                else {
+                    startActivity(Intent(this@MainActivity,RestaurantListActivity::class.java))
+                    finish()
                 }
-                else
-                {
-                    phoneLogin()
-                }
+            } else {
+                phoneLogin()
             }
-
         }
     }
 
@@ -121,7 +114,7 @@ class MainActivity : AppCompatActivity() {
         dialog!!.dismiss()
         Common.currentRestaurant = restaurantModel
         Common.currentShipperUser = userModel
-        startActivity(Intent(this, com.alfian.deliveryordershipper.HomeActivity::class.java))
+        startActivity(Intent(this, HomeActivity::class.java))
         finish()
     }
 

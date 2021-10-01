@@ -24,7 +24,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private var menuClickId: Int=-1
     private lateinit var appBarConfiguration: AppBarConfiguration
-    lateinit var drawerLayout: DrawerLayout
+    private lateinit var drawerLayout: DrawerLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,14 +59,17 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         Paper.init(this)
         val data = Paper.book().read<String>(Common.TRIP_START)
         if (!TextUtils.isEmpty(data))
-            startActivity(Intent(this, com.alfian.deliveryordershipper.ShippingActivity::class.java))
+            startActivity(Intent(this, ShippingActivity::class.java))
     }
 
     private fun updateToken() {
         FirebaseInstallations.getInstance().getToken(true)
             .addOnFailureListener { e -> Toast.makeText(this@HomeActivity,""+e.message,Toast.LENGTH_SHORT).show() }
             .addOnSuccessListener { instanceIdResult ->
-                Common.updateToken(this@HomeActivity, instanceIdResult.token,false,true)
+                Common.updateToken(this@HomeActivity, instanceIdResult.token,
+                    isServerToken = false,
+                    isShipperToken = true
+                )
             }
     }
 
@@ -82,7 +85,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onNavigationItemSelected(p0: MenuItem): Boolean {
-        p0.setCheckable(true)
+        p0.isCheckable = true
         drawerLayout.closeDrawers()
         when(p0.itemId){
             R.id.nav_sign_out -> signOut()
@@ -95,8 +98,8 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val builder = androidx.appcompat.app.AlertDialog.Builder(this)
         builder.setTitle("Sign out")
             .setMessage("Do you really want to exit?")
-            .setNegativeButton("CANCEL",{dialogInterface,_ -> dialogInterface.dismiss()})
-            .setPositiveButton("OK"){dialogInterface,_ ->
+            .setNegativeButton("CANCEL") { dialogInterface, _ -> dialogInterface.dismiss() }
+            .setPositiveButton("OK"){ _, _ ->
                 Common.currentRestaurant = null
                 Common.currentShipperUser = null
                 Paper.init(this)
@@ -104,7 +107,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 FirebaseAuth.getInstance().signOut()
 
                 val intent = Intent(this@HomeActivity,
-                    com.alfian.deliveryordershipper.MainActivity::class.java)
+                    MainActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
                 finish()
