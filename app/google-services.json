@@ -8,6 +8,72 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:322096062501:android:58bc6cfebd2b8624881fcc",
+        "android_client_info": {
+          "package_name": "com.alfian.deliveryorderadmin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "322096062501-meli9to87suuml6ul9bj6g6jeq66k53g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQR17U03V1yTVR4aSYdth6QDTI4p1xzQk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "322096062501-meli9to87suuml6ul9bj6g6jeq66k53g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:322096062501:android:de3c808619a560bb881fcc",
+        "android_client_info": {
+          "package_name": "com.alfian.deliveryordershipper"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "322096062501-s9ht5ba78b0urk54l1cshpvken2bln61.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.alfian.deliveryordershipper",
+            "certificate_hash": "53b830eacd01b3caa1c7af3d18647cd81c4ea3ce"
+          }
+        },
+        {
+          "client_id": "322096062501-meli9to87suuml6ul9bj6g6jeq66k53g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQR17U03V1yTVR4aSYdth6QDTI4p1xzQk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "322096062501-meli9to87suuml6ul9bj6g6jeq66k53g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:322096062501:android:7fb492f310a7ef4d881fcc",
         "android_client_info": {
           "package_name": "com.example.kotlineatitv2client"
