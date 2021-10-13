@@ -20,13 +20,13 @@
             android:weightSum="10">
 
             <ImageView
-                android:id="@+id/img_food"
+                android:id="@+id/img_item"
                 android:layout_width="0dp"
                 android:layout_gravity="center"
                 android:layout_height="60dp"
                 android:layout_weight="2"
                 android:layout_marginRight="10dp"
-                android:src="@drawable/ic_baseline_restaurant_menu_24"
+                android:src="@drawable/product"
                 />
 
             <LinearLayout

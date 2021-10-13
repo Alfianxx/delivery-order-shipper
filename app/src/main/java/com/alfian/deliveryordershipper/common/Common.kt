@@ -19,7 +19,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import com.alfian.deliveryordershipper.R
-import com.alfian.deliveryordershipper.model.RestaurantModel
+import com.alfian.deliveryordershipper.model.ShopModel
 import com.alfian.deliveryordershipper.model.ShipperUserModel
 import com.alfian.deliveryordershipper.model.TokenModel
 import com.google.android.gms.maps.model.LatLng
@@ -28,9 +28,9 @@ import kotlin.math.abs
 import kotlin.math.atan
 
 object Common {
-    const val RESTAURANT_SAVE: String="RESTAURANT_SAVE"
-    var currentRestaurant: RestaurantModel?=null
-    const val RESTAURANT_REF: String="Restaurant" //same as firebase
+    const val SHOP_SAVE: String="SHOP_SAVE"
+    var currentShop: ShopModel?=null
+    const val SHOP_REF: String="Shop" //same as firebase
     const val TRIP_START: String ="Trip"
     const val SHIPPING_DATA: String ="ShippingData"
     const val SHIPPING_ORDER_REF: String="ShippingOrder" //same as server app
@@ -100,9 +100,9 @@ object Common {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         {
             val notificationChannel = NotificationChannel(notificationChannelId,
-                "Eat It V2",NotificationManager.IMPORTANCE_DEFAULT)
+                "Delivery Order",NotificationManager.IMPORTANCE_DEFAULT)
 
-            notificationChannel.description = "Eat It V2"
+            notificationChannel.description = "Delivery Order"
             notificationChannel.enableLights(true)
             notificationChannel.enableVibration(true)
             notificationChannel.lightColor = (Color.RED)
@@ -114,7 +114,7 @@ object Common {
 
         builder.setContentTitle(title!!).setContentText(content!!).setAutoCancel(true)
             .setSmallIcon(R.mipmap.ic_launcher_round)
-            .setLargeIcon(BitmapFactory.decodeResource(context.resources,R.drawable.ic_baseline_restaurant_menu_24))
+            .setLargeIcon(BitmapFactory.decodeResource(context.resources,R.drawable.shop))
         if(pendingIntent != null)
             builder.setContentIntent(pendingIntent)
 

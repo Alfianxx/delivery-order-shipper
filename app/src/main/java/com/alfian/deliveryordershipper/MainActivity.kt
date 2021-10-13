@@ -4,10 +4,11 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.alfian.deliveryordershipper.common.Common
-import com.alfian.deliveryordershipper.model.RestaurantModel
+import com.alfian.deliveryordershipper.model.ShopModel
 import com.alfian.deliveryordershipper.model.ShipperUserModel
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
@@ -62,13 +63,14 @@ class MainActivity : AppCompatActivity() {
             val user = firebaseAuth.currentUser
             if (user != null) {
                 Paper.init(this@MainActivity)
-                val jsonEncode = Paper.book().read<String>(Common.RESTAURANT_SAVE)
-                val restaurantModel = Gson().fromJson<RestaurantModel>(jsonEncode,
-                    object:TypeToken<RestaurantModel>(){}.type)
-                if (restaurantModel != null)
-                    checkServerUserFromFirebase(user, restaurantModel)
+                val jsonEncode = Paper.book().read<String>(Common.SHOP_SAVE)
+                Log.d("abcde", "MainActiv jsonEncode : $jsonEncode")
+                val shopModel = Gson().fromJson<ShopModel>(jsonEncode,
+                    object:TypeToken<ShopModel>(){}.type)
+                if (shopModel != null)
+                    checkServerUserFromFirebase(user, shopModel)
                 else {
-                    startActivity(Intent(this@MainActivity,RestaurantListActivity::class.java))
+                    startActivity(Intent(this@MainActivity,ShopListActivity::class.java))
                     finish()
                 }
             } else {
@@ -77,11 +79,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkServerUserFromFirebase(user: FirebaseUser, restaurantModel: RestaurantModel) {
+    private fun checkServerUserFromFirebase(user: FirebaseUser, shopModel: ShopModel) {
         dialog!!.show()
         //Init serverRef
-        serverRef = FirebaseDatabase.getInstance().getReference(Common.RESTAURANT_REF)
-            .child(restaurantModel.uid)
+        serverRef = FirebaseDatabase.getInstance().getReference(Common.SHOP_REF)
+            .child(shopModel.uid)
             .child(Common.SHIPPER_REF)
         serverRef!!.child(user.uid)
             .addListenerForSingleValueEvent(object : ValueEventListener {
@@ -96,7 +98,7 @@ class MainActivity : AppCompatActivity() {
                         val userModel = dataSnapshot.getValue(ShipperUserModel::class.java)
                         if (userModel!!.isActive)
                         {
-                            goToHomeActivity(userModel,restaurantModel)
+                            goToHomeActivity(userModel,shopModel)
                         }
                         else{
                             dialog!!.dismiss()
@@ -110,9 +112,9 @@ class MainActivity : AppCompatActivity() {
             })
     }
 
-    private fun goToHomeActivity(userModel: ShipperUserModel, restaurantModel: RestaurantModel) {
+    private fun goToHomeActivity(userModel: ShipperUserModel, shopModel: ShopModel) {
         dialog!!.dismiss()
-        Common.currentRestaurant = restaurantModel
+        Common.currentShop = shopModel
         Common.currentShipperUser = userModel
         startActivity(Intent(this, HomeActivity::class.java))
         finish()
@@ -123,7 +125,7 @@ class MainActivity : AppCompatActivity() {
             .createSignInIntentBuilder()
             .setAvailableProviders(providers!!)
             .setTheme(R.style.LoginTheme)
-            .setLogo(R.drawable.logo)
+            .setLogo(R.drawable.delivery_logo)
             .build(),APP_REQUEST_CODE)
     }
 

@@ -12,7 +12,7 @@ class OrderModel {
     var lng:Double = 0.toDouble()
     var totalPayment:Double = 0.toDouble()
     var finalPayment:Double = 0.toDouble()
-    var isCod:Boolean = false
+    var cod:Boolean? = false
     var discount:Int = 0
     var cartItemList:List<CartItem>?=null
     var createDate:Long=0

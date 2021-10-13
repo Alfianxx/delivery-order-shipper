@@ -8,6 +8,30 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/DeliveryOrderShipper/app/src/main/res/drawable/gradient_bg.xml" value="0.20260416666666667" />
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/DeliveryOrderShipper/app/src/main/res/drawable/ic_baseline_restaurant_menu_24.xml" value="0.1984375" />
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/DeliveryOrderShipper/app/src/main/res/drawable/login_bg.xml" value="0.20260416666666667" />
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/DeliveryOrderShipper/app/src/main/res/drawable/side_nav_bar.xml" value="0.20260416666666667" />
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/DeliveryOrderShipper/app/src/main/res/layout/activity_home.xml" value="0.18645833333333334" />
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/DeliveryOrderShipper/app/src/main/res/layout/activity_main.xml" value="0.5" />
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/DeliveryOrderShipper/app/src/main/res/layout/activity_restaurant_list.xml" value="0.18229166666666666" />
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/DeliveryOrderShipper/app/src/main/res/layout/activity_shipping.xml" value="0.33" />
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/DeliveryOrderShipper/app/src/main/res/layout/activity_shop_list.xml" value="0.18229166666666666" />
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/DeliveryOrderShipper/app/src/main/res/layout/app_bar_main.xml" value="0.18229166666666666" />
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/DeliveryOrderShipper/app/src/main/res/layout/content_main.xml" value="0.1" />
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/DeliveryOrderShipper/app/src/main/res/layout/fragment_gallery.xml" value="0.18229166666666666" />
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/DeliveryOrderShipper/app/src/main/res/layout/fragment_home.xml" value="0.18645833333333334" />
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/DeliveryOrderShipper/app/src/main/res/layout/fragment_slideshow.xml" value="0.18645833333333334" />
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/DeliveryOrderShipper/app/src/main/res/layout/layout_register.xml" value="0.18229166666666666" />
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/DeliveryOrderShipper/app/src/main/res/layout/layout_restaurant.xml" value="0.18" />
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/DeliveryOrderShipper/app/src/main/res/layout/layout_shipper.xml" value="0.18229166666666666" />
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/DeliveryOrderShipper/app/src/main/res/layout/layout_shipping_order.xml" value="0.22" />
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/DeliveryOrderShipper/app/src/main/res/layout/layout_shop.xml" value="0.25" />
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/DeliveryOrderShipper/app/src/main/res/layout/nav_header_main.xml" value="0.18645833333333334" />
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/DeliveryOrderShipper/app/src/main/res/menu/activity_main_drawer.xml" value="0.18229166666666666" />
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/DeliveryOrderShipper/app/src/main/res/menu/home.xml" value="0.18229166666666666" />
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/DeliveryOrderShipper/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1984375" />
+        <entry key="..\:/Coding/AndroidStudio/Skripsi/DeliveryOrderShipper/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.1984375" />
         <entry key="..\:/Coding/AndroidStudio/Skripsi/KotlinEatItV2Shipper/app/src/main/res/drawable/ic_baseline_exit_to_app_24.xml" value="0.20260416666666667" />
         <entry key="..\:/Coding/AndroidStudio/Skripsi/KotlinEatItV2Shipper/app/src/main/res/layout/activity_home.xml" value="0.25" />
         <entry key="..\:/Coding/AndroidStudio/Skripsi/KotlinEatItV2Shipper/app/src/main/res/layout/activity_shipping.xml" value="0.25" />

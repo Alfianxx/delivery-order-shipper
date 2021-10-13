@@ -3,6 +3,7 @@ package com.alfian.deliveryordershipper
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.AnimationUtils
@@ -14,12 +15,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.alfian.deliveryordershipper.adapter.MyRestaurantAdapter
-import com.alfian.deliveryordershipper.callback.IRestaurantCallbackListener
+import com.alfian.deliveryordershipper.adapter.MyShopAdapter
+import com.alfian.deliveryordershipper.callback.IShopCallbackListener
 import com.alfian.deliveryordershipper.common.Common
-import com.alfian.deliveryordershipper.model.RestaurantModel
+import com.alfian.deliveryordershipper.model.ShopModel
 import com.alfian.deliveryordershipper.model.ShipperUserModel
-import com.alfian.deliveryordershipper.model.eventbus.RestaurantSelectEvent
+import com.alfian.deliveryordershipper.model.eventbus.ShopSelectEvent
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -30,54 +31,54 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
-class RestaurantListActivity : AppCompatActivity(), IRestaurantCallbackListener {
+class ShopListActivity : AppCompatActivity(), IShopCallbackListener {
 
-    private lateinit var recyclerRestaurant:RecyclerView
+    private lateinit var recyclerShop:RecyclerView
     lateinit var dialog: AlertDialog
     private lateinit var layoutAnimationController:LayoutAnimationController
-    private var adapter: MyRestaurantAdapter?=null
+    private var adapter: MyShopAdapter?=null
 
     private var serverRef:DatabaseReference?=null
-    lateinit var listener: IRestaurantCallbackListener
+    lateinit var listener: IShopCallbackListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_restaurant_list)
+        setContentView(R.layout.activity_shop_list)
 
         initViews()
-        loadRestaurantFromFirebase()
+        loadShopFromFirebase()
 
     }
 
-    private fun loadRestaurantFromFirebase() {
+    private fun loadShopFromFirebase() {
         dialog.show()
 
-        val restaurantModels = ArrayList<RestaurantModel>()
-        val restaurantRef = FirebaseDatabase.getInstance()
-            .getReference(Common.RESTAURANT_REF)
-        restaurantRef.addListenerForSingleValueEvent(object:ValueEventListener{
+        val shopModels = ArrayList<ShopModel>()
+        val shopRef = FirebaseDatabase.getInstance()
+            .getReference(Common.SHOP_REF)
+        shopRef.addListenerForSingleValueEvent(object:ValueEventListener{
             override fun onDataChange(p0: DataSnapshot) {
                 if (p0.exists())
                 {
-                    for (restaurantSnapshot in p0.children)
+                    for (shopSnapshot in p0.children)
                     {
-                        val restaurantModel = restaurantSnapshot.getValue(RestaurantModel::class.java)
-                        restaurantModel!!.uid = restaurantSnapshot.key!!
-                        restaurantModels.add(restaurantModel)
+                        val shopModel = shopSnapshot.getValue(ShopModel::class.java)
+                        shopModel!!.uid = shopSnapshot.key!!
+                        shopModels.add(shopModel)
                     }
-                    if (restaurantModels.size > 0)
-                        listener.onRestaurantLoadSuccess(restaurantModels)
+                    if (shopModels.size > 0)
+                        listener.onShopLoadSuccess(shopModels)
                     else
-                        listener.onRestaurantLoadFailed("Restaurant list empty")
+                        listener.onShopLoadFailed("Shop list empty")
                 }
                 else
                 {
-                    listener.onRestaurantLoadFailed("Restaurant list not found")
+                    listener.onShopLoadFailed("Shop list not found")
                 }
             }
 
             override fun onCancelled(p0: DatabaseError) {
-                listener.onRestaurantLoadFailed(p0.message)
+                listener.onShopLoadFailed(p0.message)
             }
 
         })
@@ -93,19 +94,19 @@ class RestaurantListActivity : AppCompatActivity(), IRestaurantCallbackListener 
         layoutAnimationController = AnimationUtils.loadLayoutAnimation(this,R.anim.layout_item_from_left)
         val layoutManager = LinearLayoutManager(this)
         layoutManager.orientation = RecyclerView.VERTICAL
-        recyclerRestaurant = findViewById(R.id.recycler_restaurant)
-        recyclerRestaurant.layoutManager = layoutManager
-        recyclerRestaurant.addItemDecoration(DividerItemDecoration(this,layoutManager.orientation))
+        recyclerShop = findViewById(R.id.recycler_shop)
+        recyclerShop.layoutManager = layoutManager
+        recyclerShop.addItemDecoration(DividerItemDecoration(this,layoutManager.orientation))
     }
 
-    override fun onRestaurantLoadSuccess(restaurantList: List<RestaurantModel>) {
+    override fun onShopLoadSuccess(shopList: List<ShopModel>) {
         dialog.dismiss()
-        adapter = MyRestaurantAdapter(this,restaurantList)
-        recyclerRestaurant.adapter = adapter!!
-        recyclerRestaurant.layoutAnimation = layoutAnimationController
+        adapter = MyShopAdapter(this,shopList)
+        recyclerShop.adapter = adapter!!
+        recyclerShop.layoutAnimation = layoutAnimationController
     }
 
-    override fun onRestaurantLoadFailed(message: String) {
+    override fun onShopLoadFailed(message: String) {
         Toast.makeText(this,message,Toast.LENGTH_SHORT).show()
     }
 
@@ -120,18 +121,18 @@ class RestaurantListActivity : AppCompatActivity(), IRestaurantCallbackListener 
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
-    fun onRestaurantSelectEvent(restaurantSelectEvent: RestaurantSelectEvent)
+    fun onShopSelectEvent(shopSelectEvent: ShopSelectEvent)
     {
         val user = FirebaseAuth.getInstance().currentUser
         if (user != null)
-            checkServerUserFromFirebase(user,restaurantSelectEvent.restaurantModel)
+            checkServerUserFromFirebase(user,shopSelectEvent.shopModel)
     }
 
-    private fun checkServerUserFromFirebase(user: FirebaseUser, restaurantModel: RestaurantModel) {
+    private fun checkServerUserFromFirebase(user: FirebaseUser, shopModel: ShopModel) {
         dialog.show()
         serverRef = FirebaseDatabase.getInstance()
-            .getReference(Common.RESTAURANT_REF)
-            .child(restaurantModel.uid)
+            .getReference(Common.SHOP_REF)
+            .child(shopModel.uid)
             .child(Common.SHIPPER_REF)
 
         serverRef!!.child(user.uid)
@@ -141,30 +142,30 @@ class RestaurantListActivity : AppCompatActivity(), IRestaurantCallbackListener 
                     {
                         val userModel = p0.getValue(ShipperUserModel::class.java)
                         if (userModel!!.isActive)
-                            goToHomeActivity(userModel,restaurantModel)
+                            goToHomeActivity(userModel,shopModel)
                         else
                         {
                             dialog.dismiss()
-                            Toast.makeText(this@RestaurantListActivity,"You must be allowed by Server app",Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@ShopListActivity,"You must be allowed by Server app",Toast.LENGTH_SHORT).show()
                         }
                     }
                     else
                     {
                         dialog.dismiss()
-                        showRegisterDialog(user,restaurantModel.uid)
+                        showRegisterDialog(user,shopModel.uid)
                     }
                 }
 
                 override fun onCancelled(p0: DatabaseError) {
                     dialog.dismiss()
-                    Toast.makeText(this@RestaurantListActivity,p0.message,Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@ShopListActivity,p0.message,Toast.LENGTH_SHORT).show()
                 }
 
             })
     }
 
     private fun showRegisterDialog(user: FirebaseUser, uid: String) {
-        val builder = AlertDialog.Builder(this@RestaurantListActivity)
+        val builder = AlertDialog.Builder(this@ShopListActivity)
         builder.setTitle("Register")
         builder.setMessage("Please fill information \n Admin will accept your account late")
 
@@ -199,7 +200,7 @@ class RestaurantListActivity : AppCompatActivity(), IRestaurantCallbackListener 
 
                 dialog.show()
                 //Init server ref
-                serverRef = FirebaseDatabase.getInstance().getReference(Common.RESTAURANT_REF)
+                serverRef = FirebaseDatabase.getInstance().getReference(Common.SHOP_REF)
                     .child(uid)
                     .child(Common.SHIPPER_REF)
                 serverRef!!.child(serverUserModel.uid!!)
@@ -207,7 +208,7 @@ class RestaurantListActivity : AppCompatActivity(), IRestaurantCallbackListener 
                     .addOnFailureListener { e ->
                         dialog.dismiss()
                         Toast.makeText(
-                            this@RestaurantListActivity,
+                            this@ShopListActivity,
                             "" + e.message,
                             Toast.LENGTH_SHORT
                         ).show()
@@ -215,7 +216,7 @@ class RestaurantListActivity : AppCompatActivity(), IRestaurantCallbackListener 
                     .addOnCompleteListener {
                         dialog.dismiss()
                         Toast.makeText(
-                            this@RestaurantListActivity,
+                            this@ShopListActivity,
                             "Register success! Admin will check and active user soon",
                             Toast.LENGTH_SHORT
                         ).show()
@@ -228,12 +229,12 @@ class RestaurantListActivity : AppCompatActivity(), IRestaurantCallbackListener 
         registerDialog.show()
     }
 
-    private fun goToHomeActivity(userModel: ShipperUserModel,restaurantModel: RestaurantModel) {
+    private fun goToHomeActivity(userModel: ShipperUserModel, shopModel: ShopModel) {
         dialog.dismiss()
         Common.currentShipperUser = userModel
-        val jsonEncode = Gson().toJson(restaurantModel) //encode all information
+        val jsonEncode = Gson().toJson(shopModel) //encode all information
         Paper.init(this)
-        Paper.book().write(Common.RESTAURANT_SAVE,jsonEncode)
+        Paper.book().write(Common.SHOP_SAVE,jsonEncode)
         startActivity(Intent(this, HomeActivity::class.java))
         finish()
     }

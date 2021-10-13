@@ -3,6 +3,7 @@ package com.alfian.deliveryordershipper
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -100,10 +101,10 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             .setMessage("Do you really want to exit?")
             .setNegativeButton("CANCEL") { dialogInterface, _ -> dialogInterface.dismiss() }
             .setPositiveButton("OK"){ _, _ ->
-                Common.currentRestaurant = null
+                Common.currentShop = null
                 Common.currentShipperUser = null
                 Paper.init(this)
-                Paper.book().delete(Common.RESTAURANT_SAVE)
+//                Paper.book().delete(Common.SHOP_SAVE)     // todo fix : hapus ini
                 FirebaseAuth.getInstance().signOut()
 
                 val intent = Intent(this@HomeActivity,

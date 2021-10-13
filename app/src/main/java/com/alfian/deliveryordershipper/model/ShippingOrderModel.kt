@@ -4,10 +4,10 @@ class ShippingOrderModel {
     var key:String?=null
     var shipperPhone:String?=null
     var shipperName:String?=null
-    var currentLat = 0.0
-    var currentLng = 0.0
+    var currentLat: Double? = 0.0
+    var currentLng: Double? = 0.0
     var orderModel:OrderModel?=null
-    var isStartTrip=false
-    var estimateTime:String="UNKNOWN"
-    var restaurantKey:String?=null //same as server app
+    var startTrip: Boolean?=false
+    var estimateTime:String?="UNKNOWN"
+    var shopKey:String?=null //same as server app
 }

@@ -34,7 +34,7 @@ class MyShippingOrderAdapter(var context: Context,
         var txtOrderAddress:TextView = itemView.findViewById(R.id.txt_order_address) as TextView
         var txtOrderNumber:TextView = itemView.findViewById(R.id.txt_order_number) as TextView
         var txtPayment:TextView = itemView.findViewById(R.id.txt_payment) as TextView
-        var imgFood:ImageView = itemView.findViewById(R.id.img_food) as ImageView
+        var imgItem:ImageView = itemView.findViewById(R.id.img_item) as ImageView
         var btnShipNow:MaterialButton = itemView.findViewById(R.id.btn_ship_now) as MaterialButton
 
     }
@@ -52,8 +52,8 @@ class MyShippingOrderAdapter(var context: Context,
         Glide.with(context)
             .load(
                 shippingOrderModelList[position]
-                    .orderModel!!.cartItemList!![0].foodImage)
-            .into(holder.imgFood)
+                    .orderModel!!.cartItemList!![0].itemImage)
+            .into(holder.imgItem)
         holder.txtDate.text = StringBuilder(simpleDateFormat.format(shippingOrderModelList[position].orderModel!!.createDate))
         Common.setSpanStringColor("No.: ",shippingOrderModelList[position].orderModel!!.key,
         holder.txtOrderNumber,Color.parseColor("#BA454A"))
@@ -64,7 +64,7 @@ class MyShippingOrderAdapter(var context: Context,
         Common.setSpanStringColor("Payment.: ",shippingOrderModelList[position].orderModel!!.transactionId,
             holder.txtPayment,Color.parseColor("#BA454A"))
 
-        if (shippingOrderModelList[position].isStartTrip)
+        if (shippingOrderModelList[position].startTrip!!)
         {
             holder.btnShipNow.isEnabled=false
         }

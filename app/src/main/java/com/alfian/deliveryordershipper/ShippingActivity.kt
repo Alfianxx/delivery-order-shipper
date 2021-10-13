@@ -111,6 +111,8 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
         Place.Field.LAT_LNG)
 
     val TAG = "abcd"
+    private val mode = "walking"    // driving || walking || bicycling || transit
+    private val transitRouting = "fewer_transfers"  // less_walking || fewer_transfers  ->   // hanya untuk mode transit
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -234,9 +236,8 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
             }
             fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
 
-                compositeDisposable.add(iGoogleApi!!.getDirections(
-                    "driving",
-                    "less_driving",
+                compositeDisposable.add(iGoogleApi!!.getDirections(mode,
+                    transitRouting,
                     Common.buildLocationString(location),
                     StringBuilder().append(shippingOrderModel!!.orderModel!!.lat)
                         .append(",")
@@ -267,8 +268,8 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
                         updateData["estimateTime"] = estimateTime
 
                         FirebaseDatabase.getInstance()
-                            .getReference(Common.RESTAURANT_REF)
-                            .child(Common.currentRestaurant!!.uid)
+                            .getReference(Common.SHOP_REF)
+                            .child(Common.currentShop!!.uid)
                             .child(Common.SHIPPING_ORDER_REF)
                             .child(shippingOrderModel!!.key!!)
                             .updateChildren(updateData)
@@ -358,8 +359,8 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
                         updateData["shipperUid"] = Common.currentShipperUser!!.uid!!
 
                         FirebaseDatabase.getInstance()
-                            .getReference(Common.RESTAURANT_REF)
-                            .child(shippingOrderModel!!.restaurantKey!!)
+                            .getReference(Common.SHOP_REF)
+                            .child(shippingOrderModel!!.shopKey!!)
                             .child(Common.ORDER_REF)
                             .child(shippingOrderModel!!.orderModel!!.key!!)
                             .updateChildren(updateData)
@@ -368,8 +369,8 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
 
                                 //Delete shipping order information
                                 FirebaseDatabase.getInstance()
-                                    .getReference(Common.RESTAURANT_REF)
-                                    .child(shippingOrderModel!!.restaurantKey!!)
+                                    .getReference(Common.SHOP_REF)
+                                    .child(shippingOrderModel!!.shopKey!!)
                                     .child(Common.SHIPPING_ORDER_REF)
                                     .child(shippingOrderModel!!.orderModel!!.key!!)
                                     .removeValue()
@@ -514,8 +515,8 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
             {
                 compositeDisposable.add(
                     iGoogleApi!!.getDirections(
-                        "driving",
-                        "less_driving",
+                        mode,
+                        transitRouting,
                         Common.buildLocationString(lastLocation),
                         StringBuilder().append(shippingOrderModel!!.orderModel!!.lat)
                             .append(",")
@@ -547,8 +548,8 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
                             Log.d(TAG, "updateLocation: run 2...")
 
                             FirebaseDatabase.getInstance()
-                                .getReference(Common.RESTAURANT_REF)
-                                .child(Common.currentRestaurant!!.uid)
+                                .getReference(Common.SHOP_REF)
+                                .child(Common.currentShop!!.uid)
                                 .child(Common.SHIPPING_ORDER_REF)
                                 .child(shippingOrderModel!!.key!!)
                                 .updateChildren(updateData)
@@ -579,8 +580,8 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
         from: java.lang.StringBuilder,
         to: java.lang.StringBuilder
     ) {
-        compositeDisposable.add(iGoogleApi!!.getDirections("driving",
-        "less_driving",
+        compositeDisposable.add(iGoogleApi!!.getDirections(mode,
+        transitRouting,
         from.toString(),
         to.toString(),
         getString(R.string.google_maps_key))!!
@@ -725,8 +726,8 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
                 ))
 
                 Glide.with(this)
-                    .load(shippingOrderModel!!.orderModel!!.cartItemList!![0].foodImage)
-                    .into(img_food_image)
+                    .load(shippingOrderModel!!.orderModel!!.cartItemList!![0].itemImage)
+                    .into(img_item_image)
             }
         }
         else
@@ -754,11 +755,6 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
         ) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return
         }
         fusedLocationProviderClient.lastLocation
@@ -772,7 +768,7 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
                     .append(location.longitude)
                     .toString()
 
-                compositeDisposable.add(iGoogleApi!!.getDirections("driving","less_driving",
+                compositeDisposable.add(iGoogleApi!!.getDirections(mode,transitRouting,
                     from,to,
                     getString(R.string.google_maps_key))!!
                     .subscribeOn(Schedulers.io())
@@ -833,11 +829,7 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
         ) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+
             return
         }
         fusedLocationProviderClient.lastLocation
@@ -851,7 +843,7 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
                             .append(location.longitude)
                             .toString()
 
-                compositeDisposable.add(iGoogleApi!!.getDirections("driving","less_driving",
+                compositeDisposable.add(iGoogleApi!!.getDirections(mode,transitRouting,
                 from,to,
                 getString(R.string.google_maps_key))!!
                     .subscribeOn(Schedulers.io())
@@ -884,7 +876,6 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
 
                                     Log.d("aan12345", "drawRoutes: ukuran : ${polylineList.size}")
                                     Log.d("aan12345", "drawRoutes: indices : ${polylineList.indices}")
-
                                 }
                                 if (i == 1) {
 //                                    polylineList.addAll(Common.decodePoly(polyline))
@@ -892,12 +883,13 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
                                     //blue
                                     polylineOptions = PolylineOptions()
                                     polylineOptions!!.color(Color.BLUE)
-                                    polylineOptions!!.width(5.0f)   // ukuran rute
+                                    polylineOptions!!.width(8.0f)   // ukuran rute
                                     polylineOptions!!.startCap(SquareCap())
                                     polylineOptions!!.endCap(SquareCap())
                                     polylineOptions!!.jointType(JointType.ROUND)
                                     polylineOptions!!.addAll(polylineList)
                                     mMap.addPolyline(polylineOptions)
+                                    Log.d(TAG, "rute ke 2")
                                 }
                                 if (i == 2) {
 //                                    polylineList.addAll(Common.decodePoly(polyline))
@@ -905,15 +897,31 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
                                     //green
                                     polylineOptions = PolylineOptions()
                                     polylineOptions!!.color(Color.GREEN)
+                                    polylineOptions!!.width(5.0f)
+                                    polylineOptions!!.startCap(SquareCap())
+                                    polylineOptions!!.endCap(SquareCap())
+                                    polylineOptions!!.jointType(JointType.ROUND)
+                                    polylineOptions!!.addAll(polylineList)
+                                    mMap.addPolyline(polylineOptions)
+                                    Log.d(TAG, "rute ke 3")
+                                }
+                                if (i == 3) {
+                                    Toast.makeText(this, "masih ada rute", Toast.LENGTH_LONG).show()
+                                    Log.d(TAG, "rute ke 4")
+
+                                    polylineOptions = PolylineOptions()
+                                    polylineOptions!!.color(Color.YELLOW)
                                     polylineOptions!!.width(12.0f)
                                     polylineOptions!!.startCap(SquareCap())
                                     polylineOptions!!.endCap(SquareCap())
                                     polylineOptions!!.jointType(JointType.ROUND)
                                     polylineOptions!!.addAll(polylineList)
                                     mMap.addPolyline(polylineOptions)
+
                                 }
-                                if (i == 3) {
-                                    Toast.makeText(this, "masih ada rute", Toast.LENGTH_LONG).show()
+                                if (i == 4) {
+//                                    Toast.makeText(this, "masih ada rute", Toast.LENGTH_LONG).show()
+                                    Log.d(TAG, "rute ke 5")
                                 }
                             }
 
@@ -954,12 +962,12 @@ class ShippingActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mMap.uiSettings.isZoomControlsEnabled = true
         try {
-            val success = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.uber_light_with_label))
+            val success = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.delivery_light_with_label))
             if (!success)
-                Log.d("Darwis","Failed to load map style")
+                Log.d("aan","Failed to load map style")
         }catch (ex:Resources.NotFoundException)
         {
-            Log.d("Darwis","Not found json string for map style")
+            Log.d("aan","Not found json string for map style")
         }
     }
 

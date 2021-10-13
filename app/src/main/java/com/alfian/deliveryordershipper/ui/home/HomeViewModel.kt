@@ -1,6 +1,7 @@
 package com.alfian.deliveryordershipper.ui.home
 
 import android.text.TextUtils
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.alfian.deliveryordershipper.callback.IShippingOrderCallbackListener
@@ -32,8 +33,8 @@ class HomeViewModel : ViewModel(), IShippingOrderCallbackListener {
     private fun loadOrderByShipper(shipperPhone: String) {
         val tempList : MutableList<ShippingOrderModel> = ArrayList()
         val orderRef = FirebaseDatabase.getInstance()
-            .getReference(Common.RESTAURANT_REF)
-            .child(Common.currentRestaurant!!.uid)
+            .getReference(Common.SHOP_REF)
+            .child(Common.currentShop!!.uid)
             .child(Common.SHIPPING_ORDER_REF)
             .orderByChild("shipperPhone")
             .equalTo(Common.currentShipperUser!!.phone)

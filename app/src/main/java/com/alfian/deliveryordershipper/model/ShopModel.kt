@@ -1,6 +1,6 @@
 package com.alfian.deliveryordershipper.model
 
-class RestaurantModel {
+class ShopModel {
     var uid:String=""
     var name:String=""
     var address:String=""

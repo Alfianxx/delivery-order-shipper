@@ -1,23 +1,19 @@
 package com.alfian.deliveryordershipper.model
 
 class CartItem {
-    var foodId:String=""
+    var itemId:String=""
 
-    var foodName:String?=null
+    var itemName:String?=null
 
-    var foodImage:String?=null
+    var itemImage:String?=null
 
-    var foodPrice:Double=0.0
+    var itemPrice:Double=0.0
 
-    var foodQuantity:Int=0
-
-    var foodAddon:String?=""
-
-    var foodSize:String?=""
+    var itemQuantity:Int=0
 
     var userPhone:String?=""
 
-    var foodExtraPrice:Double=0.0
+    var itemExtraPrice:Double=0.0
 
     var uid:String?=""
 }
