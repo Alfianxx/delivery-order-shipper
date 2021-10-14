@@ -38,6 +38,9 @@ object Common {
     const val SHIPPER_REF = "Shipper"
     var currentShipperUser: ShipperUserModel? = null
 
+    const val SHOP_ADMIN = "ShopAdmin"  // baru
+    const val MYSHOP = "myshop"
+
     const val NOTIF_TITLE = "title"
     const val NOTIF_CONTENT = "content"
     const val CATEGORY_REF: String = "Category"

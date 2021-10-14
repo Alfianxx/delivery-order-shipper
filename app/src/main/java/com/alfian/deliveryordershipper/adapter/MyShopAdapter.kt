@@ -53,7 +53,7 @@ class MyShopAdapter (internal var context: Context,
     }
 
     override fun onBindViewHolder(holder: MyShopAdapter.MyViewHolder, position: Int) {
-        Glide.with(context).load(shopList[position].imageUrl)
+        Glide.with(context).load(R.drawable.img_shop)
             .into(holder.imgShop!!)
         holder.txtShopName!!.text = shopList[position].name
         holder.txtShopAddress!!.text = shopList[position].address

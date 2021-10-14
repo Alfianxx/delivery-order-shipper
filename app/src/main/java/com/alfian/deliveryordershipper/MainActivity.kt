@@ -64,11 +64,11 @@ class MainActivity : AppCompatActivity() {
             if (user != null) {
                 Paper.init(this@MainActivity)
                 val jsonEncode = Paper.book().read<String>(Common.SHOP_SAVE)
-                Log.d("abcde", "MainActiv jsonEncode : $jsonEncode")
                 val shopModel = Gson().fromJson<ShopModel>(jsonEncode,
                     object:TypeToken<ShopModel>(){}.type)
-                if (shopModel != null)
+                if (shopModel != null){
                     checkServerUserFromFirebase(user, shopModel)
+                }
                 else {
                     startActivity(Intent(this@MainActivity,ShopListActivity::class.java))
                     finish()

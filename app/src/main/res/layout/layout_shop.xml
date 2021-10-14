@@ -12,10 +12,9 @@
 
         <ImageView
             android:id="@+id/img_shop"
-            android:src="@drawable/delivery_logo"
-            android:scaleType="centerCrop"
+            android:src="@drawable/img_shop"
             android:layout_width="match_parent"
-            android:layout_height="150dp"/>
+            android:layout_height="400dp"/>
 
         <LinearLayout
             android:orientation="vertical"

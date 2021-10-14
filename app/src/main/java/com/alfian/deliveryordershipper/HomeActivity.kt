@@ -6,6 +6,8 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -49,6 +51,13 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
         navView.setNavigationItemSelectedListener (this)
+
+        val headerView = navView.getHeaderView(0)
+        val tvName = headerView.findViewById<TextView>(R.id.tvName)
+        val tvEmail = headerView.findViewById<TextView>(R.id.tvEmail)
+
+        Common.setSpanString("Hello ", Common.currentShipperUser?.name, tvName)
+        tvEmail.text = Common.currentShipperUser?.phone
     }
 
     override fun onResume() {
@@ -104,7 +113,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 Common.currentShop = null
                 Common.currentShipperUser = null
                 Paper.init(this)
-//                Paper.book().delete(Common.SHOP_SAVE)     // todo fix : hapus ini
+                Paper.book().delete(Common.SHOP_SAVE)     //fix : login
                 FirebaseAuth.getInstance().signOut()
 
                 val intent = Intent(this@HomeActivity,

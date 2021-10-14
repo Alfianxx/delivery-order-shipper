@@ -56,18 +56,24 @@ class ShopListActivity : AppCompatActivity(), IShopCallbackListener {
         val shopModels = ArrayList<ShopModel>()
         val shopRef = FirebaseDatabase.getInstance()
             .getReference(Common.SHOP_REF)
+            .child(Common.MYSHOP)
+            .child(Common.SHOP_ADMIN)
         shopRef.addListenerForSingleValueEvent(object:ValueEventListener{
             override fun onDataChange(p0: DataSnapshot) {
                 if (p0.exists())
                 {
-                    for (shopSnapshot in p0.children)
-                    {
-                        val shopModel = shopSnapshot.getValue(ShopModel::class.java)
-                        shopModel!!.uid = shopSnapshot.key!!
-                        shopModels.add(shopModel)
-                    }
+//                    for (shopSnapshot in p0.children)
+//                    {
+//                        val shopModel = shopSnapshot.getValue(ShopModel::class.java)
+//                        shopModel!!.uid = shopSnapshot.key!!
+//                        shopModels.add(shopModel)
+//                    }
+                    val shopModel = p0.getValue(ShopModel::class.java)
+                    shopModel?.uid = p0.ref.parent?.key!!   //ambil parent key = myshop
+                    shopModels.add(shopModel!!)
+
                     if (shopModels.size > 0)
-                        listener.onShopLoadSuccess(shopModels)
+                        listener.onShopLoadSuccess(shopModels)  // eventbus langsung terpanggil
                     else
                         listener.onShopLoadFailed("Shop list empty")
                 }
@@ -141,9 +147,11 @@ class ShopListActivity : AppCompatActivity(), IShopCallbackListener {
                     if (p0.exists())
                     {
                         val userModel = p0.getValue(ShipperUserModel::class.java)
-                        if (userModel!!.isActive)
+                        if (userModel!!.isActive) {
+                            Log.d("abcd123", "masuk go to home")
+                            Common.currentShop = shopModel      // fix error login berkali kali
                             goToHomeActivity(userModel,shopModel)
-                        else
+                        } else
                         {
                             dialog.dismiss()
                             Toast.makeText(this@ShopListActivity,"You must be allowed by Server app",Toast.LENGTH_SHORT).show()
@@ -152,7 +160,7 @@ class ShopListActivity : AppCompatActivity(), IShopCallbackListener {
                     else
                     {
                         dialog.dismiss()
-                        showRegisterDialog(user,shopModel.uid)
+                        showRegisterDialog(user, shopModel.uid)
                     }
                 }
 
